@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -71,12 +70,41 @@ impl<T> LinkedList<T> {
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let mut merged_list = LinkedList::new();
+
+        let mut current_a = list_a.start;
+        let mut current_b = list_b.start;
+
+        while let (Some(node_a), Some(node_b)) = (current_a, current_b) {
+            let val_a = unsafe { node_a.as_ref().val };
+            let val_b = unsafe { node_b.as_ref().val };
+
+            if val_a < val_b {
+                merged_list.add(val_a);
+                current_a = unsafe { node_a.as_ref().next };
+            } else {
+                merged_list.add(val_b);
+                current_b = unsafe { node_b.as_ref().next };
+            }
         }
+
+        while let Some(node_a) = current_a {
+            merged_list.add(unsafe { node_a.as_ref().val });
+            current_a = unsafe { node_a.as_ref().next };
+        }
+
+        while let Some(node_b) = current_b {
+            merged_list.add(unsafe { node_b.as_ref().val });
+            current_b = unsafe { node_b.as_ref().next };
+        }
+
+        merged_list
+		// //TODO
+		// Self {
+        //     length: 0,
+        //     start: None,
+        //     end: None,
+        // }
 	}
 }
 
@@ -135,7 +163,7 @@ mod tests {
 		let vec_a = vec![1,3,5,7];
 		let vec_b = vec![2,4,6,8];
 		let target_vec = vec![1,2,3,4,5,6,7,8];
-		
+
 		for i in 0..vec_a.len(){
 			list_a.add(vec_a[i]);
 		}

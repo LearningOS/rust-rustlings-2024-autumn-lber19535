@@ -3,7 +3,6 @@
 	This question requires you to use a stack to achieve a bracket match
 */
 
-// I AM NOT DONE
 #[derive(Debug)]
 struct Stack<T> {
 	size: usize,
@@ -31,8 +30,12 @@ impl<T> Stack<T> {
 		self.size += 1;
 	}
 	fn pop(&mut self) -> Option<T> {
-		// TODO
-		None
+		if self.size > 0 {
+			self.size -= 1;
+			self.data.pop()
+		} else {
+			None
+		}
 	}
 	fn peek(&self) -> Option<&T> {
 		if 0 == self.size {
@@ -101,8 +104,30 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 
 fn bracket_match(bracket: &str) -> bool
 {
-	//TODO
-	true
+	let mut stack = Stack::new();
+	let bracket_pairs = [('(', ')'), ('{', '}'), ('[', ']')].iter().cloned().collect::<std::collections::HashMap<_, _>>();
+
+	for ch in bracket.chars() {
+		if bracket_pairs.contains_key(&ch) {
+			// If the character is an opening bracket, push it onto the stack
+			stack.push(ch);
+		} else if bracket_pairs.values().any(|&v| v == ch) {
+			// If the character is a closing bracket, check for a match
+			match stack.pop() {
+				Some(last) => {
+					// Check if the last opening bracket matches the current closing bracket
+					if let Some(&expected) = bracket_pairs.get(&last) {
+						if expected != ch {
+							return false; // Mismatched brackets
+						}
+					}
+				}
+				None => return false, // Stack is empty, but closing bracket found
+			}
+		}
+	}
+
+	stack.is_empty() // If the stack is empty, all brackets were matched
 }
 
 #[cfg(test)]

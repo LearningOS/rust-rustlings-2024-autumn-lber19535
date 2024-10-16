@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +37,22 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value); // Add to the end
+        self.count += 1; // Increment count
+        self.bubble_up(self.count); // Restore heap property
+    }
+
+    fn bubble_up(&mut self, idx: usize) {
+        let mut index = idx;
+        while index > 1 {
+            let parent_index = self.parent_idx(index);
+            if (self.comparator)(&self.items[index], &self.items[parent_index]) {
+                self.items.swap(index, parent_index); // Swap if the heap property is violated
+                index = parent_index; // Move up to the parent index
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +72,27 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+
+        if right <= self.count && (self.comparator)(&self.items[right], &self.items[left]) {
+            right
+        } else {
+            left
+        }
+    }
+
+    fn bubble_down(&mut self, idx: usize) {
+        let mut index = idx;
+        while self.children_present(index) {
+            let smallest_child_index = self.smallest_child_idx(index);
+            if (self.comparator)(&self.items[smallest_child_index], &self.items[index]) {
+                self.items.swap(index, smallest_child_index);
+                index = smallest_child_index;
+            } else {
+                break;
+            }
+        }
     }
 }
 
@@ -79,13 +113,27 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+
+        // Save the root item (min/max)
+        let root = self.items[1].clone();
+
+        // Replace root with the last element
+        self.items[1] = self.items[self.count].clone();
+        self.count -= 1; // Decrease count
+        self.items.pop(); // Remove the last element
+
+        // Restore the heap property
+        self.bubble_down(1);
+
+        Some(root)
     }
 }
 
