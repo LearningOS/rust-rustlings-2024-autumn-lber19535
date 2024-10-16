@@ -21,5 +21,5 @@ fn main() {
     // Cargo about that.
 
     let your_command = "pass";
-    println!("cargo:rustc-cfg=feature[={}]", your_command);
+    println!("cargo:rustc-cfg=feature[=\"{}\"]", your_command);
 }
