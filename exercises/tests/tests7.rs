@@ -35,7 +35,17 @@
 // hint.
 
 
-fn main() {}
+fn main() {
+    // Get the current Unix timestamp in seconds
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("Time went backwards")
+        .as_secs();
+
+    // Set the TEST_FOO environment variable
+    println!("cargo:rerun-if-env-changed=TEST_FOO");
+    println!("cargo:TEST_FOO={}", timestamp);
+}
 
 #[cfg(test)]
 mod tests {
